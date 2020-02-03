@@ -1,15 +1,14 @@
 {
   "name": "ayncws",
   "version": "0.0.1",
-  "description": "",
+  "description": "A websocket wrapper for node and web that allows you to give it a config and it will forward methods from the client to the server",
   "main": "main.js",
   "scripts": {
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["websockets", "server", "client"],
+  "author": "anbcodes",
+  "license": "MIT",
   "dependencies": {
-    "jest": "^25.1.0",
     "ws": "^7.2.1"
   }
 }
