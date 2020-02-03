@@ -1,0 +1,15 @@
+{
+  "name": "ayncws",
+  "version": "0.0.1",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jest": "^25.1.0",
+    "ws": "^7.2.1"
+  }
+}
