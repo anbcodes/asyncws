@@ -1,6 +1,6 @@
 {
   "name": "@anbcodes/asyncws",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "A websocket wrapper for node and web that allows you to give it a config and it will forward methods from the client to the server",
   "main": "main.js",
   "private": false,
