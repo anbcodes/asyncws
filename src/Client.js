@@ -14,13 +14,17 @@ module.exports = class Client {
     this.initMethods();
   }
 
-  onmess(data) {
+  onmess({ data }) {
     data = JSON.parse(data);
     let lastSent = this.messages.shift();
+    console.log(lastSent);
     if (data.code === 0) {
       lastSent.resolve(data.data);
     } else {
-      lastSent.reject({type: [...this.config.errors, SyntaxError, TypeError, ReferenceError, RangeError, URIError, EvalError, Error][data.code + 1], ...data});
+      let error = new [...this.config.errors, SyntaxError, TypeError, ReferenceError, RangeError, URIError, EvalError, Error][data.code + 1]();
+      error.message = data.data.message;
+      error.code = data.data.code;
+      lastSent.reject(error);
     }
   }
 
@@ -38,6 +42,6 @@ module.exports = class Client {
     return new Promise((resolve, reject) => {
       this.socket.send(JSON.stringify(value));
       this.messages.push({resolve, reject});
-    }
+    })
   }
 }

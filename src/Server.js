@@ -5,7 +5,7 @@ module.exports = class Server {
     this.port = port;
     this.config = config;
     this.methodsArray = methodsArray;
-    this.socket = new WebSocket({ port });
+    this.socket = new WebSocket.Server({ port });
     this.clients = [];
 
     this.socket.on('connection', this.onConn.bind(this))
@@ -14,35 +14,44 @@ module.exports = class Server {
   onConn(ws) {
     let clientIndex = this.clients.length;
     this.clients.push(ws);
-    ws.on('data', (...args) => this.onData(clientIndex, ...args));
+    ws.on('message', (...args) => this.onData(clientIndex, ...args));
   }
 
   async onData(clientIndex, data) {
-    let data = JSON.parse(data);
-    this.methodsArray.forEach(object => {
+    data = JSON.parse(data);
+    for (let i = 0; i < this.methodsArray.length; i += 1) {
+      let object = this.methodsArray[i];
       let methodName = this.config.methods[data.type]
       if (typeof object[methodName] === 'function') {
+        let success = false;
+        let dataToReturn = {};
         try {
-          let data = await object[methodName](data.data);
-          this.send({ type: 0, data })
+          dataToReturn = await object[methodName](clientIndex, ...data.data);
+          success = true;
         } catch (error) {
-          this.sendFunctionError(error);
+          console.error(error);
+          this.sendFunctionError(clientIndex, error);
+        }
+
+        if (success) {
+          console.log('DATA:', dataToReturn);
+          this.send(clientIndex, { code: 0, data: dataToReturn });
         }
       }
-    })
+    }
   }
 
-  sendFunctionError(error) {
+  sendFunctionError(client, error) {
     let sent = false;
     [...this.config.errors, SyntaxError, TypeError, ReferenceError, RangeError, URIError, EvalError, Error].forEach((e, i) => {
       if (error instanceof e) {
         sent = true;
-        this.send({ type: i + 1, data: { code: error.code, message: error.message } });
+        this.send(client, { code: i + 1, data: { code: error.code, message: error.message } });
       }
     });
   }
 
-  send(data) {
-    this.socket.send(JSON.stringify(data));
+  send(client, data) {
+    this.clients[client].send(JSON.stringify(data));
   }
 }
